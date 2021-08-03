@@ -12,6 +12,7 @@ import GraphViewSidePanel from "./side-panel/side-panel";
 import {ModelingContext} from "../../../util/modeling-context";
 import {defaultModelingView} from "../../../config/modeling.config";
 import GraphVis from "./graph-vis/graph-vis";
+import {updateModelInfo} from "../api/modeling";
 
 type Props = {
   entityTypes: any;
@@ -20,6 +21,26 @@ type Props = {
 };
 
 const GraphView: React.FC<Props> = (props) => {
+
+  const getGraphCoords = () => {
+    const data: any = JSON.parse(localStorage.getItem("graphCoords") ?? JSON.stringify({}));
+    return data;
+  }
+  const setGraphCoords = (id: string, coords: any) => {
+    let data = getGraphCoords();
+    data[id] = coords;
+    localStorage.setItem("graphCoords", JSON.stringify(data));
+  }
+
+  const saveEntityCoords = (entityName, x, y) => {
+    // Get existing model def
+    console.log("props.entityTypes", props.entityTypes);
+    console.log("saveEntityCoords", entityName, x, y);
+    // Add coordinate info
+
+    // Save via endpoint
+    // TODO use api/modeling updateModelInfo() to update coords in entity model
+  }
 
   const [viewSidePanel, setViewSidePanel] = useState(false);
   const {modelingOptions, setSelectedEntity} = useContext(ModelingContext);
@@ -128,6 +149,9 @@ const GraphView: React.FC<Props> = (props) => {
         <GraphVis
           entityTypes={props.entityTypes}
           handleEntitySelection={handleEntitySelection}
+          setGraphCoords={setGraphCoords}
+          graphCoords={getGraphCoords()}
+          saveEntityCoords={saveEntityCoords}
         />
       </div>
     </div>;

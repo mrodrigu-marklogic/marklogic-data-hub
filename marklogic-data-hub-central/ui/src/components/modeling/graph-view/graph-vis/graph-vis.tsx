@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useLayoutEffect} from "react";
+import React, {useState, useEffect, useContext, useLayoutEffect} from "react";
 import Graph from "react-graph-vis";
 import "./graph-vis.scss";
 import ReactDOMServer from "react-dom/server";
@@ -10,6 +10,9 @@ import graphConfig from "../../../../config/graph-vis.config";
 type Props = {
   entityTypes: any;
   handleEntitySelection: any;
+  setGraphCoords: any;
+  graphCoords: any;
+  saveEntityCoords: any;
 };
 
 // TODO temp hardcoded node data, remove when retrieved from db
@@ -45,7 +48,8 @@ const GraphVis: React.FC<Props> = (props) => {
   const graphType = "shape";
 
   // const [nodePositions, setNodePositions] = useState({});
-  const [physicsEnabled, setPhysicsEnabled] = useState(true);
+  //const [physicsEnabled, setPhysicsEnabled] = useState(true);
+  const [physicsEnabled, setPhysicsEnabled] = useState(false);
   const [graphData, setGraphData] = useState({nodes: [], edges: []});
   let testingMode = true; // Should be used further to handle testing only in non-production environment
 
@@ -128,7 +132,11 @@ const GraphVis: React.FC<Props> = (props) => {
                 values.borderWidth = 0;
               }
             }
-          }
+          },
+          // x: props.graphCoords[e.entityName] ? props.graphCoords[e.entityName][0] : null,
+          // y: props.graphCoords[e.entityName] ? props.graphCoords[e.entityName][1] : null
+          x: (e.model.hubCentral && e.model.hubCentral.modeling.graphX) ? e.model.hubCentral.modeling.graphX : null,
+          y: (e.model.hubCentral && e.model.hubCentral.modeling.graphY) ? e.model.hubCentral.modeling.graphY : null          
         };
       });
     } else if (graphType === "image") { // TODO for custom SVG node, not currently used
@@ -206,7 +214,12 @@ const GraphVis: React.FC<Props> = (props) => {
       }
     },
     dragEnd: (event) => {
-      //setNodePositions({[event.nodes[0]]: event.pointer.canvas});
+      // TODO use api/modeling updateModelInfo() to update coords in entity model
+      let {nodes} = event;
+      let positions = network.getPositions([nodes[0]])[nodes[0]];
+      if (positions && positions.x && positions.y) {
+        props.saveEntityCoords(nodes[0], positions.x, positions.y);
+      }
     },
     hoverNode: (event) => {
       event.event.target.style.cursor = "pointer";
