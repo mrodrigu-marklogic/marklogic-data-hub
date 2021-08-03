@@ -1,4 +1,4 @@
-import React, {CSSProperties, useContext, useState} from "react";
+import React, {CSSProperties, useContext, useState, useEffect} from "react";
 import {AutoComplete, Dropdown, Icon, Menu} from "antd";
 import styles from "./graph-view.module.scss";
 import {ModelingTooltips} from "../../../config/tooltips.config";
@@ -11,6 +11,7 @@ import SplitPane from "react-split-pane";
 import GraphViewSidePanel from "./side-panel/side-panel";
 import {ModelingContext} from "../../../util/modeling-context";
 import GraphVis from "./graph-vis/graph-vis";
+import {updateModelInfo} from "../../../api/modeling";
 
 type Props = {
   entityTypes: any;
@@ -22,14 +23,39 @@ type Props = {
   toggleRelationshipModal: any;
   toggleShowEntityModal: any;
   toggleIsEditModal: any;
+  setEntityTypesFromServer: any;
 };
 
 const GraphView: React.FC<Props> = (props) => {
+
+  const saveEntityCoords = async (entityName, x, y) => {
+    const index = props.entityTypes.map(e => e.entityName).indexOf(entityName);
+    if (index >= 0) {
+      let def = props.entityTypes[index].model.definitions[entityName];
+      await updateModelInfo(
+        entityName,
+        def.description ? def.description : "",
+        def.namespace ? def.namespace : "",
+        def.namespacePrefix ? def.namespacePrefix : "",
+        x,
+        y
+      );
+      setCoordsChanged(true);
+    }
+  };
 
   const {modelingOptions, setSelectedEntity} = useContext(ModelingContext);
   const [filterMenuSuggestions, setFilterMenuSuggestions] = useState(["a"]);
   const [entityFiltered, setEntityFiltered] = useState("");
   const [isEntityFiltered, setIsEntityFiltered] = useState(false);
+  const [coordsChanged, setCoordsChanged] = useState(false);
+
+  useEffect(() => {
+    if (coordsChanged) {
+      props.setEntityTypesFromServer();
+      setCoordsChanged(false);
+    }
+  }, [coordsChanged]);
 
   const publishIconStyle: CSSProperties = {
     width: "18px",
@@ -189,6 +215,7 @@ const GraphView: React.FC<Props> = (props) => {
           relationshipModalVisible={props.relationshipModalVisible}
           canReadEntityModel={props.canReadEntityModel}
           canWriteEntityModel={props.canWriteEntityModel}
+          saveEntityCoords={saveEntityCoords}
         />
       </div>
     </div>;
