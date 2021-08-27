@@ -33,8 +33,8 @@ const GraphVis: React.FC<Props> = (props) => {
   const graphType = "shape";
 
   const {modelingOptions, setSelectedEntity} = useContext(ModelingContext);
-  //const [physicsEnabled, setPhysicsEnabled] = useState(true);
-  const [physicsEnabled, setPhysicsEnabled] = useState(false);
+  const [physicsEnabled, setPhysicsEnabled] = useState(true);
+  //const [physicsEnabled, setPhysicsEnabled] = useState(false);
   const [graphData, setGraphData] = useState({nodes: [], edges: []});
   let testingMode = true; // Should be used further to handle testing only in non-production environment
   const [openRelationshipModal, setOpenRelationshipModal] = useState(false);
@@ -42,7 +42,7 @@ const GraphVis: React.FC<Props> = (props) => {
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [clickedNode, setClickedNode] = useState(undefined);
   const [menuPosition, setMenuPosition] = useState({});
-  const [saveAllCoords, setSaveAllCoords] = useState(false);
+  //const [saveAllCoords, setSaveAllCoords] = useState(false);
   const [coordsLoaded, setCoordsLoaded] = useState(false);
   const [coords, setCoords] = useState<any>({});
 
@@ -79,7 +79,7 @@ const GraphVis: React.FC<Props> = (props) => {
         nodes: getNodes(),
         edges: getEdges()
       });
-      setSaveAllCoords(true);
+      //setSaveAllCoords(true);
       return () => {
         setClickedNode(undefined);
         setMenuPosition({});
@@ -88,36 +88,36 @@ const GraphVis: React.FC<Props> = (props) => {
     }
   }, [props.entityTypes, props.filteredEntityTypes.length, coordsLoaded]);
 
-  const coordsExist = (entityName) => {
-    let result = false;
-    const index = props.entityTypes.map(e => e.entityName).indexOf(entityName);
-    if (index >= 0 && props.entityTypes[index].model.hubCentral) {
-      if (props.entityTypes[index].model.hubCentral.modeling.graphX && 
-          props.entityTypes[index].model.hubCentral.modeling.graphY) {
-            result = true;
-      }
-    }
-    return result;
-  }
+  // const coordsExist = (entityName) => {
+  //   let result = false;
+  //   const index = props.entityTypes.map(e => e.entityName).indexOf(entityName);
+  //   if (index >= 0 && props.entityTypes[index].model.hubCentral) {
+  //     if (props.entityTypes[index].model.hubCentral.modeling.graphX && 
+  //         props.entityTypes[index].model.hubCentral.modeling.graphY) {
+  //           result = true;
+  //     }
+  //   }
+  //   return result;
+  // }
 
-  const saveUnsavedCoords = () => {
-    if (props.entityTypes) {
-      props.entityTypes.forEach(ent => {
-        if (!coordsExist(ent.entityName)) {
-          let positions = network.getPositions([ent.entityName])[ent.entityName];
-          props.saveEntityCoords(ent.entityName, positions.x, positions.y);
-        }
-      })
-    }
-  };
+  // const saveUnsavedCoords = () => {
+  //   if (props.entityTypes) {
+  //     props.entityTypes.forEach(ent => {
+  //       if (!coordsExist(ent.entityName)) {
+  //         let positions = network.getPositions([ent.entityName])[ent.entityName];
+  //         props.saveEntityCoords(ent.entityName, positions.x, positions.y);
+  //       }
+  //     })
+  //   }
+  // };
 
   // Save all unsaved coords
-  useEffect(() => {
-    if (saveAllCoords && network) {
-      saveUnsavedCoords();
-    }
-    setSaveAllCoords(false);
-  }, [saveAllCoords]);
+  // useEffect(() => {
+  //   if (saveAllCoords && network) {
+  //     saveUnsavedCoords();
+  //   }
+  //   setSaveAllCoords(false);
+  // }, [saveAllCoords]);
 
   // Focus on the selected nodes in filter input
   useEffect(() => {
@@ -184,7 +184,7 @@ const GraphVis: React.FC<Props> = (props) => {
     if (graphType === "shape") {
       nodes = props.entityTypes && props.entityTypes?.map((e) => {
         let label = "";
-        return {
+        let tmp = {
           ...graphConfig.defaultNodeProps,
           id: e.entityName,
           label: label.concat(
@@ -198,7 +198,7 @@ const GraphVis: React.FC<Props> = (props) => {
           },
           borderWidth: e.entityName === modelingOptions.selectedEntity && props.entitySelected ? 3 : 0,
           physics: {
-            enabled: false
+            enabled: true
           },
           chosen: {
             node: function (values, id, selected, hovering) {
@@ -215,10 +215,14 @@ const GraphVis: React.FC<Props> = (props) => {
                 values.borderWidth = 0;
               }
             }
-          },
-          x: coords[e.entityName] && coords[e.entityName].graphX ? coords[e.entityName].graphX : null,
-          y: coords[e.entityName] && coords[e.entityName].graphY ? coords[e.entityName].graphY : null          
+          },        
         };
+        if (coords[e.entityName] && coords[e.entityName].graphX && coords[e.entityName].graphY) {
+          tmp.physics.enabled = false;
+          tmp.x = coords[e.entityName].graphX;
+          tmp.y = coords[e.entityName].graphY;
+        }
+        return tmp;
       });
     } else if (graphType === "image") { // TODO for custom SVG node, not currently used
       nodes = props.entityTypes && props.entityTypes?.map((e) => {
@@ -324,7 +328,7 @@ const GraphVis: React.FC<Props> = (props) => {
       //randomSeed: "0.7696:1625099255200",
     },
     physics: {
-      enabled: false,
+      enabled: physicsEnabled,
       barnesHut: {
         springLength: 160,
         avoidOverlap: 0.4
