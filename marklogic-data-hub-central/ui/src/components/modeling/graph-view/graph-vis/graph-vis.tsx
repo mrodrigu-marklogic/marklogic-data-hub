@@ -73,10 +73,31 @@ const GraphVis: React.FC<Props> = (props) => {
   useEffect(() => {
     if (props.entityTypes) { // && coordsLoaded) {
       console.log("useEffect props.entityTypes init", coords);
+      let counter = 0;
+      props.entityTypes.forEach(e => {
+        counter++;
+        if (e.model.hubCentral) {
+          let opts = e.model.hubCentral.modeling;
+          if (opts.graphX && opts.graphY) {
+            if(physicsEnabled){
+              setPhysicsEnabled(false);
+              // if(counter === props.entityTypes.length) {
+              //   setGraphData({
+              //     nodes: getNodes(),
+              //     edges: getEdges()
+              //   });
+              // }
+              return false;
+            }
+          }
+        }
+      })
+
       setGraphData({
         nodes: getNodes(),
         edges: getEdges()
       });
+      
       //setSaveAllCoords(true);
       return () => {
         setClickedNode(undefined);
@@ -195,9 +216,9 @@ const GraphVis: React.FC<Props> = (props) => {
             border: e.entityName === modelingOptions.selectedEntity && props.entitySelected ? graphConfig.nodeStyles.selectColor : getColor(e.entityName),
           },
           borderWidth: e.entityName === modelingOptions.selectedEntity && props.entitySelected ? 3 : 0,
-          physics: {
-            enabled: true
-          },
+          // physics: {
+          //   enabled: true
+          // },
           chosen: {
             node: function (values, id, selected, hovering) {
               if (selected && hovering) {
@@ -216,7 +237,7 @@ const GraphVis: React.FC<Props> = (props) => {
           },        
         };
         if (coords[e.entityName] && coords[e.entityName].graphX && coords[e.entityName].graphY) {
-          tmp.physics.enabled = false;
+          //tmp.physics.enabled = false;
           tmp.x = coords[e.entityName].graphX;
           tmp.y = coords[e.entityName].graphY;
         }
@@ -331,7 +352,10 @@ const GraphVis: React.FC<Props> = (props) => {
         springLength: 160,
         avoidOverlap: 0.4
       },
-      stabilization: false
+      stabilization: {
+        enabled: false,
+        //iterations: 300,
+      }
     },
     interaction: {
       navigationButtons: true,
@@ -460,8 +484,15 @@ const GraphVis: React.FC<Props> = (props) => {
     doubleClick: (event) => {
     },
     stabilized: (event) => {
-      if (network && modelingOptions.selectedEntity) {
-        network.selectNodes([modelingOptions.selectedEntity]);
+      if (network) {
+        let nodePositions = network.getPositions();
+        if(nodePositions) {
+          console.log("stabilized",event, nodePositions);
+          //ToDo- use nodePositions to save those in the database
+        }
+        if(modelingOptions.selectedEntity) {
+          network.selectNodes([modelingOptions.selectedEntity]);
+        }
       }
     },
     oncontext: (event) => {
