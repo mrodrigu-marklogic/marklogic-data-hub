@@ -54,7 +54,6 @@ const GraphVis: React.FC<Props> = (props) => {
   // Load coords on init
   useEffect(() => {
     if (!coordsLoaded && props.entityTypes.length > 0) {
-      console.log("useEffect props.entityTypes load coords", coords);
       let newCoords = {};
       props.entityTypes.forEach(e => {
         if (e.model.hubCentral) {
@@ -72,7 +71,6 @@ const GraphVis: React.FC<Props> = (props) => {
   // Initialize or update graph
   useEffect(() => {
     if (props.entityTypes) { // && coordsLoaded) {
-      console.log("useEffect props.entityTypes init", coords);
       let counter = 0;
       props.entityTypes.forEach(e => {
         counter++;
@@ -107,28 +105,28 @@ const GraphVis: React.FC<Props> = (props) => {
     }
   }, [props.entityTypes, props.filteredEntityTypes.length, coordsLoaded]);
 
-  // const coordsExist = (entityName) => {
-  //   let result = false;
-  //   const index = props.entityTypes.map(e => e.entityName).indexOf(entityName);
-  //   if (index >= 0 && props.entityTypes[index].model.hubCentral) {
-  //     if (props.entityTypes[index].model.hubCentral.modeling.graphX && 
-  //         props.entityTypes[index].model.hubCentral.modeling.graphY) {
-  //           result = true;
-  //     }
-  //   }
-  //   return result;
-  // }
+  const coordsExist = (entityName) => {
+    let result = false;
+    const index = props.entityTypes.map(e => e.entityName).indexOf(entityName);
+    if (index >= 0 && props.entityTypes[index].model.hubCentral) {
+      if (props.entityTypes[index].model.hubCentral.modeling.graphX && 
+          props.entityTypes[index].model.hubCentral.modeling.graphY) {
+            result = true;
+      }
+    }
+    return result;
+  }
 
-  // const saveUnsavedCoords = () => {
-  //   if (props.entityTypes) {
-  //     props.entityTypes.forEach(ent => {
-  //       if (!coordsExist(ent.entityName)) {
-  //         let positions = network.getPositions([ent.entityName])[ent.entityName];
-  //         props.saveEntityCoords(ent.entityName, positions.x, positions.y);
-  //       }
-  //     })
-  //   }
-  // };
+  const saveUnsavedCoords = () => {
+    if (props.entityTypes) {
+      props.entityTypes.forEach(ent => {
+        if (!coordsExist(ent.entityName)) {
+          let positions = network.getPositions([ent.entityName])[ent.entityName];
+          props.saveEntityCoords(ent.entityName, positions.x, positions.y);
+        }
+      })
+    }
+  };
 
   // Save all unsaved coords
   // useEffect(() => {
@@ -150,7 +148,9 @@ const GraphVis: React.FC<Props> = (props) => {
     if (network && modelingOptions.selectedEntity) {
       // Ensure entity exists
       if (props.entityTypes.some(e => e.entityName === modelingOptions.selectedEntity)) {
+        // Persist selection and coords
         network.selectNodes([modelingOptions.selectedEntity]);
+        saveUnsavedCoords();
       } else {
         // Entity type not found, unset in context
         setSelectedEntity(undefined);
@@ -198,7 +198,6 @@ const GraphVis: React.FC<Props> = (props) => {
   };
 
   const getNodes = () => {
-    console.log("getNodes", coords);
     let nodes;
     if (graphType === "shape") {
       nodes = props.entityTypes && props.entityTypes?.map((e) => {
@@ -464,7 +463,6 @@ const GraphVis: React.FC<Props> = (props) => {
       if (positions && positions.x && positions.y) {
         let tmpCoords = {...coords};
         tmpCoords[nodes[0]] = {graphX: positions.x, graphY: positions.y};
-        console.log("tmpCoords", tmpCoords);
         setCoords(tmpCoords);
         props.saveEntityCoords(nodes[0], positions.x, positions.y);
       }
@@ -487,11 +485,14 @@ const GraphVis: React.FC<Props> = (props) => {
       if (network) {
         let nodePositions = network.getPositions();
         if(nodePositions) {
-          console.log("stabilized",event, nodePositions);
-          //ToDo- use nodePositions to save those in the database
+          saveUnsavedCoords();
         }
-        if(modelingOptions.selectedEntity) {
-          network.selectNodes([modelingOptions.selectedEntity]);
+        if (modelingOptions.selectedEntity) {
+          try { // visjs might not have new entity yet and error
+            network.selectNodes([modelingOptions.selectedEntity]);
+          } catch(err) { 
+            console.error(err);
+          }
         }
       }
     },
