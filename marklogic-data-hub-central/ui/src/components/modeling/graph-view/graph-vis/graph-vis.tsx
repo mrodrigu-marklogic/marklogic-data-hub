@@ -45,6 +45,7 @@ const GraphVis: React.FC<Props> = (props) => {
   //const [saveAllCoords, setSaveAllCoords] = useState(false);
   const [coordsLoaded, setCoordsLoaded] = useState(false);
   const [coords, setCoords] = useState<any>({});
+  const [hasStabilized, setHasStabilized] = useState(false);
 
   // Get network instance on init
   const [network, setNetwork] = useState<any>(null);
@@ -357,8 +358,8 @@ const GraphVis: React.FC<Props> = (props) => {
         avoidOverlap: 0.4
       },
       stabilization: {
-        enabled: false,
-        //iterations: 300,
+        enabled: true,
+        iterations: 1,
       }
     },
     interaction: {
@@ -486,10 +487,16 @@ const GraphVis: React.FC<Props> = (props) => {
     doubleClick: (event) => {
     },
     stabilized: (event) => {
+      // TODO if user doesn't manipulate graph, stabilize fires forever,
+      // avoid reacting to infinite event firings (Visjs bug?)
+      if (hasStabilized) return;
       if (network) {
         let nodePositions = network.getPositions();
-        if(nodePositions) {
+        // When graph is stabilized, nodePositions no longer empty
+        if ( nodePositions && Object.keys(nodePositions).length) {
+          console.log("stabilized nodePositions");
           saveUnsavedCoords();
+          setHasStabilized(true);
         }
         if (modelingOptions.selectedEntity) {
           try { // visjs might not have new entity yet and error
