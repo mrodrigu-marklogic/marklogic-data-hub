@@ -161,4 +161,41 @@ describe("Graph Validations", () => {
       graphViewSidePanel.getDeleteIcon("Person").should("be.visible");
     });
   });
+
+  it("can select all available nodes in graph view, locations persist", () => {
+    let ids = ["BabyRegistry", "Client", "Customer", "Order", "Person"];
+    let savedCoords: any = {};
+    modelPage.selectView("project-diagram");
+
+    // Select each entity node using retrieved coords
+    ids.forEach(id => {
+      graphVis.getPositionsOfNodes(id).then((nodePositions: any) => {
+        let coords: any = nodePositions[id];
+        savedCoords[id] = {x: coords.x, y: coords.y};
+        graphVis.getGraphVisCanvas().click(coords.x, coords.y);
+      });
+      // Verify entity is shown in side panel and close
+      graphViewSidePanel.getSelectedEntityHeading(id).should("be.visible");
+      graphViewSidePanel.closeSidePanel();
+    });
+
+    // Exit graph view and return
+    cy.waitUntil(() => toolbar.getCurateToolbarIcon()).click();
+    cy.waitUntil(() => toolbar.getModelToolbarIcon()).click();
+    modelPage.selectView("project-diagram");
+
+    // Select entity nodes using previously saved coords
+    ids.forEach(id => {
+      graphVis.getPositionsOfNodes(id).then(() => {
+        graphVis.getGraphVisCanvas().click(savedCoords[id].x, savedCoords[id].y);
+      });
+      // Verify entity is shown in side panel and close
+      graphViewSidePanel.getSelectedEntityHeading(id).should("be.visible");
+      graphViewSidePanel.closeSidePanel();
+    });
+
+    // TODO rearrange nodes in graph view, test selection and persistence of changed positions
+
+  });
+
 });
