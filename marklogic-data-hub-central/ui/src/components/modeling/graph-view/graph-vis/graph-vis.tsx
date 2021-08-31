@@ -120,10 +120,13 @@ const GraphVis: React.FC<Props> = (props) => {
   }
 
   const saveUnsavedCoords = () => {
+    // TODO use endpoint that saves entire updated model at once
     if (props.entityTypes) {
       props.entityTypes.forEach(ent => {
         if (!coordsExist(ent.entityName)) {
           let positions = network.getPositions([ent.entityName])[ent.entityName];
+          let newCoords = {...coords, graphX: positions.x, graphY: positions.y};
+          setCoords(newCoords);
           props.saveEntityCoords(ent.entityName, positions.x, positions.y);
         }
       })
@@ -376,10 +379,6 @@ const GraphVis: React.FC<Props> = (props) => {
     }
   };
 
-  const getRandomArbitrary = (min, max) => {
-    return Math.random() * (max - min) + min;
-  };
-
   const menuClick = (event) => {
     // TODO do something useful
     setContextMenuVisible(false);
@@ -459,14 +458,17 @@ const GraphVis: React.FC<Props> = (props) => {
       }
     },
     dragEnd: (event) => {
-      // TODO use api/modeling updateModelInfo() to update coords in entity model
       let {nodes} = event;
-      let positions = network.getPositions([nodes[0]])[nodes[0]];
-      if (positions && positions.x && positions.y) {
-        let tmpCoords = {...coords};
-        tmpCoords[nodes[0]] = {graphX: positions.x, graphY: positions.y};
-        setCoords(tmpCoords);
-        props.saveEntityCoords(nodes[0], positions.x, positions.y);
+      if (nodes.length > 0) {
+        let positions = network.getPositions([nodes[0]])[nodes[0]];
+        if (positions && positions.x && positions.y) {
+          let newCoords = {...coords};
+          newCoords[nodes[0]] = {graphX: positions.x, graphY: positions.y};
+          setCoords(newCoords);
+          props.saveEntityCoords(nodes[0], positions.x, positions.y);
+        }
+      } else {
+        // TODO handle dragging entire graph (nodes.length === 0), zooming, nav button clicks
       }
     },
     hoverNode: (event) => {
