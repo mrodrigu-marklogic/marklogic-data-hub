@@ -54,7 +54,7 @@ const GraphVis: React.FC<Props> = (props) => {
   };
   const vis = require("vis-network/standalone/umd/vis-network"); //eslint-disable-line @typescript-eslint/no-unused-vars
 
-  // Load coords on init
+  // Load coords *once* on init
   useEffect(() => {
     if (!coordsLoaded && props.entityTypes.length > 0) {
       let newCoords = {};
@@ -80,7 +80,7 @@ const GraphVis: React.FC<Props> = (props) => {
         if (e.model.hubCentral) {
           let opts = e.model.hubCentral.modeling;
           if (opts.graphX && opts.graphY) {
-            if(physicsEnabled){
+            if (physicsEnabled) {
               setPhysicsEnabled(false);
               // if(counter === props.entityTypes.length) {
               //   setGraphData({
@@ -134,14 +134,6 @@ const GraphVis: React.FC<Props> = (props) => {
       setCoords(newCoords);
     }
   };
-
-  // Save all unsaved coords
-  // useEffect(() => {
-  //   if (saveAllCoords && network) {
-  //     saveUnsavedCoords();
-  //   }
-  //   setSaveAllCoords(false);
-  // }, [saveAllCoords]);
 
   // Focus on the selected nodes in filter input
   useEffect(() => {
@@ -426,12 +418,14 @@ const GraphVis: React.FC<Props> = (props) => {
 
   const events = {
     select: (event) => {
+      console.info("SELECT", event);
       let {nodes} = event;
       if (nodes.length > 0) {
         props.handleEntitySelection(nodes[0]);
       }
     },
     click: (event) => {
+      console.info("CLICK", event);
       //if click is on an edge
       if (event.edges.length > 0 && event.nodes.length < 1) {
         let connectedNodes = network.getConnectedNodes(event.edges[0]);
@@ -463,36 +457,32 @@ const GraphVis: React.FC<Props> = (props) => {
       let {nodes} = event;
       if (nodes.length > 0) {
         let positions = network.getPositions([nodes[0]])[nodes[0]];
-        console.log("NODE dragged", positions);
+        console.info("NODE dragged", event, positions);
         if (positions && positions.x && positions.y) {
           let newCoords = {...coords};
           newCoords[nodes[0]] = {graphX: positions.x, graphY: positions.y};
           setCoords(newCoords);
           props.saveEntityCoords(nodes[0], positions.x, positions.y);
         }
-      } else {
-        let positions = network.getPositions();
-        console.log("positions", positions);
-        console.log("coords", coords);
-        let ids = Object.keys(coords);
-        let newCoords = {};
-        console.log("newCoords START", newCoords);
-        ids.forEach(id => {
-          let newX = coords[id].graphX + event.event.deltaX;
-          let newY = coords[id].graphY + event.event.deltaY;
-          newCoords[id] = {graphX: newX, graphY: newY};
-          props.saveEntityCoords(id, newX, newY);
-        });
-        console.log("newCoords END", newCoords);
-        // console.log("panned positions", positions);
-        // console.log("POSITIONS!!!!", positions);
-        // ids.forEach(ent => {
-        //   newCoords[ent] = {graphX: positions[ent].x, graphY: positions[ent].y};
-        //   props.saveEntityCoords(ent, positions[ent].x, positions[ent].y);
-        // });
-        setCoords(newCoords);
-        // TODO handle dragging entire graph (nodes.length === 0), zooming, nav button clicks
-      }
+      } 
+      // TODO Handle canvas (all nodes, edges) drag
+      // else {
+      //   // On a canvas drag, getPositions() returns old positions so useless
+      //   let positions = network.getPositions(); 
+      //   console.log("CANVAS dragged", event, positions);
+      //   let ids = Object.keys(coords);
+      //   let newCoords = {};
+      //   // Take current positions and update with drag deltas
+      //   ids.forEach(id => {
+      //     // TODO This gives the wrong results most of the time, unclear why
+      //     let newX = coords[id].graphX + event.event.deltaX;
+      //     let newY = coords[id].graphY + event.event.deltaY;
+      //     newCoords[id] = {graphX: newX, graphY: newY};
+      //     props.saveEntityCoords(id, newX, newY); // Save to db
+      //   });
+      //   setCoords(newCoords);
+      //   // TODO handle zooming, nav button clicks
+      // }
     },
     hoverNode: (event) => {
       event.event.target.style.cursor = "pointer";
@@ -509,19 +499,19 @@ const GraphVis: React.FC<Props> = (props) => {
     doubleClick: (event) => {
     },
     stabilized: (event) => {
-      // TODO if user doesn't manipulate graph, stabilize fires forever,
-      // avoid reacting to infinite event firings (Visjs bug?)
+      // NOTE if user doesn't manipulate graph on load, stabilize event 
+      // fires forever. This avoids reacting to infinite events
       if (hasStabilized) return;
       if (network) {
-        let nodePositions = network.getPositions();
+        let positions = network.getPositions();
+        console.info("STABILIZED", event, positions);
         // When graph is stabilized, nodePositions no longer empty
-        if ( nodePositions && Object.keys(nodePositions).length) {
-          console.log("stabilized nodePositions");
+        if ( positions && Object.keys(positions).length) {
           saveUnsavedCoords();
           setHasStabilized(true);
         }
         if (modelingOptions.selectedEntity) {
-          try { // visjs might not have new entity yet and error
+          try { // Visjs might not have new entity yet, catch error
             network.selectNodes([modelingOptions.selectedEntity]);
           } catch(err) { 
             console.error(err);
