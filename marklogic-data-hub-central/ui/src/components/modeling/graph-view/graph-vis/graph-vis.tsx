@@ -123,14 +123,15 @@ const GraphVis: React.FC<Props> = (props) => {
   const saveUnsavedCoords = () => {
     // TODO use endpoint that saves entire updated model at once
     if (props.entityTypes) {
+      let newCoords = {...coords};
       props.entityTypes.forEach(ent => {
         if (!coordsExist(ent.entityName)) {
           let positions = network.getPositions([ent.entityName])[ent.entityName];
-          let newCoords = {...coords, graphX: positions.x, graphY: positions.y};
-          setCoords(newCoords);
+          newCoords[ent.entityName] = {graphX: positions.x, graphY: positions.y};
           props.saveEntityCoords(ent.entityName, positions.x, positions.y);
         }
       })
+      setCoords(newCoords);
     }
   };
 
@@ -462,6 +463,7 @@ const GraphVis: React.FC<Props> = (props) => {
       let {nodes} = event;
       if (nodes.length > 0) {
         let positions = network.getPositions([nodes[0]])[nodes[0]];
+        console.log("NODE dragged", positions);
         if (positions && positions.x && positions.y) {
           let newCoords = {...coords};
           newCoords[nodes[0]] = {graphX: positions.x, graphY: positions.y};
@@ -469,6 +471,26 @@ const GraphVis: React.FC<Props> = (props) => {
           props.saveEntityCoords(nodes[0], positions.x, positions.y);
         }
       } else {
+        let positions = network.getPositions();
+        console.log("positions", positions);
+        console.log("coords", coords);
+        let ids = Object.keys(coords);
+        let newCoords = {};
+        console.log("newCoords START", newCoords);
+        ids.forEach(id => {
+          let newX = coords[id].graphX + event.event.deltaX;
+          let newY = coords[id].graphY + event.event.deltaY;
+          newCoords[id] = {graphX: newX, graphY: newY};
+          props.saveEntityCoords(id, newX, newY);
+        });
+        console.log("newCoords END", newCoords);
+        // console.log("panned positions", positions);
+        // console.log("POSITIONS!!!!", positions);
+        // ids.forEach(ent => {
+        //   newCoords[ent] = {graphX: positions[ent].x, graphY: positions[ent].y};
+        //   props.saveEntityCoords(ent, positions[ent].x, positions[ent].y);
+        // });
+        setCoords(newCoords);
         // TODO handle dragging entire graph (nodes.length === 0), zooming, nav button clicks
       }
     },
