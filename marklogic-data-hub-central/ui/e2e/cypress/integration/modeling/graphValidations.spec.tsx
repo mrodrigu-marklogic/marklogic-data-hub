@@ -196,6 +196,14 @@ describe("Graph Validations", () => {
 
     // TODO rearrange nodes in graph view, test selection and persistence of changed positions
 
+    // NOTE The following does not work, the node is selected but no dragging occurs
+    // graphVis.getPositionsOfNodes().then((nodePositions: any) => {
+    //   let clientCoords: any = nodePositions["Client"];
+    //   graphVis.getGraphVisCanvas().trigger("pointerdown", clientCoords.x, clientCoords.y, {button: 0});
+    //   graphVis.getGraphVisCanvas().trigger("pointermove", clientCoords.x+10, clientCoords.y+10, {button: 0});
+    //   graphVis.getGraphVisCanvas().trigger("pointerup", clientCoords.x+20, clientCoords.y+20, {button: 0});
+    // });
+
   });
 
 });
