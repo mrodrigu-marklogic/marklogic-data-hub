@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import styles from "./system-info.module.scss";
-import {Card, Modal, Button, Tooltip} from "antd";
+import {Card, Modal, Tooltip} from "antd";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import axios from "axios";
@@ -13,6 +13,7 @@ import {SystemInfoMessages} from "../../config/messages.config";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamationTriangle, faCopy} from "@fortawesome/free-solid-svg-icons";
 import HCAlert from "../common/hc-alert/hc-alert";
+import HCButton from "../common/hc-button/hc-button";
 
 
 const SystemInfo = (props) => {
@@ -162,11 +163,11 @@ const SystemInfo = (props) => {
                   <p>{SystemInfoMessages.downloadHubCentralFiles}</p>
                   <Tooltip title={SecurityTooltips.missingPermission} placement="bottom">
                     <div className={styles.disabledButtonContainer}>
-                      <Button
+                      <HCButton
                         aria-label="Download"
                         data-testid="downloadHubCentralFiles"
                         disabled
-                      >Download</Button>
+                      >Download</HCButton>
                     </div>
                   </Tooltip>
                 </Card>
@@ -176,12 +177,13 @@ const SystemInfo = (props) => {
                     <div className={styles.title}>Download Hub Central Files</div>
                     <p>{SystemInfoMessages.downloadHubCentralFiles}</p>
                     <div className={styles.buttonContainer}>
-                      <Button
-                        type="primary"
+                      <HCButton
+                        variant="primary"
                         aria-label="Download"
                         data-testid="downloadHubCentralFiles"
+                        size="sm"
                         onClick={downloadHubCentralFiles}
-                      >Download</Button>
+                      >Download</HCButton>
                     </div>
                   </Card>
                 </Col>
@@ -193,11 +195,12 @@ const SystemInfo = (props) => {
                   <p>{SystemInfoMessages.downloadProjectFiles}</p>
                   <Tooltip title={SecurityTooltips.missingPermission} placement="bottom">
                     <div className={styles.disabledButtonContainer}>
-                      <Button
+                      <HCButton
                         aria-label="Download"
                         data-testid="downloadProjectFiles"
+                        size="sm"
                         disabled
-                      >Download</Button>
+                      >Download</HCButton>
                     </div>
                   </Tooltip>
                 </Card>
@@ -207,12 +210,13 @@ const SystemInfo = (props) => {
                     <div className={styles.title}>Download Project Files</div>
                     <p>{SystemInfoMessages.downloadProjectFiles}</p>
                     <div className={styles.buttonContainer}>
-                      <Button
+                      <HCButton
                         type="primary"
                         aria-label="Download"
                         data-testid="downloadProjectFiles"
+                        size="sm"
                         onClick={downloadProjectFiles}
-                      >Download</Button>
+                      >Download</HCButton>
                     </div>
                   </Card>
                 </Col>
@@ -227,11 +231,12 @@ const SystemInfo = (props) => {
                   <p>{SystemInfoMessages.clearAllUserData}</p>
                   <Tooltip title={SecurityTooltips.missingPermission} placement="bottom">
                     <div className={styles.disabledButtonContainer}>
-                      <Button
+                      <HCButton
                         aria-label="Clear"
                         data-testid="clearUserData"
+                        size="sm"
                         disabled
-                      >Clear</Button>
+                      >Clear</HCButton>
                     </div>
                   </Tooltip>
                 </Card>
@@ -244,12 +249,13 @@ const SystemInfo = (props) => {
                     <div className={styles.title} data-testid="clearData">Clear All User Data</div>
                     <p>{SystemInfoMessages.clearAllUserData}</p>
                     <div className={styles.buttonContainer}>
-                      <Button
+                      <HCButton
                         type="primary"
                         aria-label="Clear"
                         data-testid="clearUserData"
+                        size="sm"
                         onClick={handleClearData}
-                      >Clear</Button>
+                      >Clear</HCButton>
                     </div>
                   </Card>
                 </Col>

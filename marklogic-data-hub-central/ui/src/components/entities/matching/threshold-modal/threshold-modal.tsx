@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from "react";
-import {Modal, Form, Input, Icon, Button, Select, Tooltip} from "antd";
+import {Modal, Form, Input, Icon, Select, Tooltip} from "antd";
 import styles from "./threshold-modal.module.scss";
 
 import ConfirmYesNo from "../../../common/confirm-yes-no/confirm-yes-no";
@@ -11,6 +11,7 @@ import {updateMatchingArtifact} from "../../../../api/matching";
 import DeleteModal from "../delete-modal/delete-modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTrashAlt} from "@fortawesome/free-solid-svg-icons";
+import HCButton from "../../../common/hc-button/hc-button";
 
 type Props = {
   isVisible: boolean;
@@ -293,7 +294,7 @@ const ThresholdModal: React.FC<Props> = (props) => {
   };
 
   const hasFormChanged = () => {
-    if (actionType ===  "custom") {
+    if (actionType === "custom") {
       let checkCustomValues = hasCustomFormValuesChanged();
       if (!isNameTouched
         && !isActionTypeTouched
@@ -417,20 +418,23 @@ const ThresholdModal: React.FC<Props> = (props) => {
 
   const modalFooter = (
     <div className={styles.editFooter}>
-      <Button type="link" onClick={() => { toggleDeleteConfirmModal(true); }}>
-        <FontAwesomeIcon  className={styles.trashIcon} icon={faTrashAlt} />
-      </Button>
+      <HCButton size="sm" variant="link" onClick={() => { toggleDeleteConfirmModal(true); }}>
+        <FontAwesomeIcon className={styles.trashIcon} icon={faTrashAlt} />
+      </HCButton>
       <div className={styles.footer}>
-        <Button
+        <HCButton
+          variant="outline-light"
+          size="sm"
           aria-label={`cancel-threshold-modal`}
           onClick={closeModal}
-        >Cancel</Button>
-        <Button
+        >Cancel</HCButton>
+        <HCButton
           className={styles.saveButton}
+          variant="primary"
+          size="sm"
           aria-label={`confirm-threshold-modal`}
-          type="primary"
           onClick={(e) => onSubmit(e)}
-        >Save</Button>
+        >Save</HCButton>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import {
   Modal,
   Form,
-  Icon, Input, Radio, Button, Select, Tooltip
+  Icon, Input, Radio, Select, Tooltip
 } from "antd";
 import React, {useState, useEffect, useContext} from "react";
 import styles from "./merge-strategy-dialog.module.scss";
@@ -12,14 +12,15 @@ import {addSliderOptions, parsePriorityOrder, handleSliderOptions, handleDeleteS
 import {MergingStep, StepType, defaultPriorityOption} from "../../../../types/curation-types";
 import {updateMergingArtifact} from "../../../../api/merging";
 import ConfirmYesNo from "../../../common/confirm-yes-no/confirm-yes-no";
+import HCButton from "../../../common/hc-button/hc-button";
 
 type Props = {
-    sourceNames: string[];
-    strategyName: string;
-    createEditMergeStrategyDialog: boolean;
-    setOpenEditMergeStrategyDialog: (createEditMergeStrategyDialog: boolean) => void;
-    isEditStrategy: boolean;
-    toggleIsEditStrategy: (isEditStrategy:boolean) => void;
+  sourceNames: string[];
+  strategyName: string;
+  createEditMergeStrategyDialog: boolean;
+  setOpenEditMergeStrategyDialog: (createEditMergeStrategyDialog: boolean) => void;
+  isEditStrategy: boolean;
+  toggleIsEditStrategy: (isEditStrategy: boolean) => void;
 };
 
 const {Option} = Select;
@@ -143,7 +144,7 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
     setStrategyNameErrorMessage(strategyNameErrorMessage);
   };
 
-  const onAddOptions =  () => {
+  const onAddOptions = () => {
     setPriorityOrderOptions(addSliderOptions(priorityOrderOptions, dropdownOption));
   };
 
@@ -184,9 +185,9 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
 
   const hasFormChanged = () => {
     if (!dropdownOptionTouched
-        && !strategyNameTouched
-        && (!maxValuesTouched || maxValues.length === 0)
-        && (!maxSourcesTouched || maxSources.length === 0)
+      && !strategyNameTouched
+      && (!maxValuesTouched || maxValues.length === 0)
+      && (!maxSourcesTouched || maxSources.length === 0)
     ) {
       return false;
     } else {
@@ -267,9 +268,9 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
     }
   }, [props.strategyName, curationOptions, props.isEditStrategy, props.sourceNames]);
 
-  let priorityOrderStrategyOptions:any[] = [defaultPriorityOption];
+  let priorityOrderStrategyOptions: any[] = [defaultPriorityOption];
   const parsedEditedFormDetails = (data) => {
-    let mergeStrategiesData: any[]  = data.mergeStrategies;
+    let mergeStrategiesData: any[] = data.mergeStrategies;
     for (let key of mergeStrategiesData) {
       if (props.strategyName === key.strategyName) {
         if (key.hasOwnProperty("priorityOrder")) {
@@ -346,10 +347,10 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
         <Form.Item
           colon={false}
           label={<span className={styles.text}>
-                        Strategy Name:&nbsp;<span className={styles.asterisk}>*</span>&nbsp;
+            Strategy Name:&nbsp;<span className={styles.asterisk}>*</span>&nbsp;
           </span>}
           labelAlign="left"
-          validateStatus={strategyNameErrorMessage? "error" : ""}
+          validateStatus={strategyNameErrorMessage ? "error" : ""}
           help={strategyNameErrorMessage}
         >
           <Input
@@ -364,7 +365,7 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
           label="Max Values:"
           labelAlign="left"
         >
-          <Radio.Group  value={radioValuesOptionClicked} onChange={handleChange}  name={"maxValues"}>
+          <Radio.Group value={radioValuesOptionClicked} onChange={handleChange} name={"maxValues"}>
             <Radio value={1} > All</Radio>
             <Radio value={2} ><Input id="maxValuesStrategyInput" value={maxValues} placeholder={"Enter max values"} onChange={handleChange} onClick={handleChange}></Input>
               <Tooltip title={MergeRuleTooltips.maxValues}>
@@ -378,7 +379,7 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
           label="Max Sources:"
           labelAlign="left"
         >
-          <Radio.Group  value={radioSourcesOptionClicked} onChange={handleChange}  name={"maxSources"}>
+          <Radio.Group value={radioSourcesOptionClicked} onChange={handleChange} name={"maxSources"}>
             <Radio value={1} > All</Radio>
             <Radio value={2} ><Input id="maxSourcesStrategyInput" value={maxSources} onChange={handleChange} onClick={handleChange} placeholder={"Enter max sources"}></Input>
               <Tooltip title={MergeRuleTooltips.maxSources}>
@@ -394,7 +395,7 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
           help={defaultStrategyErrorMessage}
           labelAlign="left"
         >
-          <Radio.Group  value={radioDefaultOptionClicked} onChange={handleChange}  name={"defaultYesNo"}>
+          <Radio.Group value={radioDefaultOptionClicked} onChange={handleChange} name={"defaultYesNo"}>
             <Radio value={1} >Yes</Radio>
             <Radio value={2} >No</Radio>
           </Radio.Group>
@@ -416,16 +417,16 @@ const MergeStrategyDialog: React.FC<Props> = (props) => {
             >
               {dropdownTypeOptions}
             </Select>
-            <Button aria-label="add-slider-button" type="primary" size="default" className={styles.addSliderButton} onClick={onAddOptions}>Add</Button>
+            <HCButton aria-label="add-slider-button" variant="primary" className={styles.addSliderButton} onClick={onAddOptions}>Add</HCButton>
           </div>
           <div>
-            <MultiSlider options={priorityOrderOptions} handleSlider={handleSlider} handleDelete={handleDelete} handleEdit={handleEdit} stepType={StepType.Merging}/>
+            <MultiSlider options={priorityOrderOptions} handleSlider={handleSlider} handleDelete={handleDelete} handleEdit={handleEdit} stepType={StepType.Merging} />
           </div>
         </div>}
         <Form.Item className={styles.submitButtonsForm}>
           <div className={styles.submitButtons}>
-            <Button aria-label={"cancel-merge-strategy"} onClick={() => onCancel()}>Cancel</Button>&nbsp;&nbsp;
-            <Button aria-label={"confirm-merge-strategy"} id={"saveButton"} type="primary" onClick={handleSubmit} >Save</Button>
+            <HCButton aria-label={"cancel-merge-strategy"} variant="outline-light" onClick={() => onCancel()}>Cancel</HCButton>&nbsp;&nbsp;
+            <HCButton aria-label={"confirm-merge-strategy"} id={"saveButton"} variant="primary" onClick={handleSubmit} >Save</HCButton>
           </div>
         </Form.Item>
       </Form>

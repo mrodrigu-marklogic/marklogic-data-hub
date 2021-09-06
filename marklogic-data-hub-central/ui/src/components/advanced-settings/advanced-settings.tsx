@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from "react";
 import Axios from "axios";
-import {Form, Input, Icon, Select, Radio, Button, Tooltip} from "antd";
+import {Form, Input, Icon, Select, Radio, Tooltip} from "antd";
 import styles from "./advanced-settings.module.scss";
 import {AdvancedSettingsTooltips} from "../../config/tooltips.config";
 import {AdvancedSettingsMessages} from "../../config/messages.config";
@@ -9,6 +9,7 @@ import "./advanced-settings.scss";
 import AdvancedTargetCollections from "./advanced-target-collections";
 import {CurationContext} from "../../util/curation-context";
 import HCAlert from "../common/hc-alert/hc-alert";
+import HCButton from "../common/hc-button/hc-button";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -976,12 +977,12 @@ const AdvancedSettings: React.FC<Props> = (props) => {
         }
         <Form.Item className={styles.submitButtonsForm}>
           <div className={styles.submitButtons}>
-            <Button data-testid={`${props.stepData.name}-cancel-settings`} onClick={() => onCancel()}>Cancel</Button>&nbsp;&nbsp;
+            <HCButton size="sm" data-testid={`${props.stepData.name}-cancel-settings`} onClick={() => onCancel()}>Cancel</HCButton>&nbsp;&nbsp;
             {!canReadWrite || !isFormValid() ? <Tooltip title={tooltips.missingPermission} placement={"bottomRight"}>
               <span className={styles.disabledCursor}>
-                <Button id={"saveButton"} className={styles.saveButton} data-testid={`${props.stepData.name}-save-settings`} type="primary" htmlType="submit" onClick={handleSubmit} disabled={true}>Save</Button>
+                <HCButton size="sm" id={"saveButton"} className={styles.saveButton} data-testid={`${props.stepData.name}-save-settings`} variant="primary" type="submit" onClick={handleSubmit} disabled={true}>Save</HCButton>
               </span>
-            </Tooltip> : <Button id={"saveButton"} data-testid={`${props.stepData.name}-save-settings`} type="primary" htmlType="submit" onClick={handleSubmit} disabled={false} onFocus={sendPayload}>Save</Button>}
+            </Tooltip> : <HCButton size="sm" id={"saveButton"} data-testid={`${props.stepData.name}-save-settings`} variant="primary" type="submit" onClick={handleSubmit} disabled={false} onFocus={sendPayload}>Save</HCButton>}
           </div>
         </Form.Item>
       </Form>

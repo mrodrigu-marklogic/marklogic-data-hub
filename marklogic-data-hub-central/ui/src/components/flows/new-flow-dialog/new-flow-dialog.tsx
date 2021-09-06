@@ -1,8 +1,9 @@
-import {Modal, Form, Input, Icon, Button, Tooltip} from "antd";
+import {Modal, Form, Input, Icon, Tooltip} from "antd";
 import React, {useState, useEffect} from "react";
 import styles from "./new-flow-dialog.module.scss";
 import {NewFlowTooltips} from "../../../config/tooltips.config";
 import {useHistory} from "react-router-dom";
+import HCButton from "../../common/hc-button/hc-button";
 
 
 const NewFlowDialog = (props) => {
@@ -46,7 +47,8 @@ const NewFlowDialog = (props) => {
 
     //add information about mapping step, load card, load list, pagination.
     if (props.newStepToFlowOptions && !props.newStepToFlowOptions.existingFlow) {
-      history.push({pathname: `/tiles/${props.newStepToFlowOptions.stepDefinitionType === "ingestion" ? "load": "curate"}`,
+      history.push({
+        pathname: `/tiles/${props.newStepToFlowOptions.stepDefinitionType === "ingestion" ? "load" : "curate"}`,
         state: {
           stepDefinitionType: props.newStepToFlowOptions.stepDefinitionType,
           targetEntityType: props.newStepToFlowOptions.targetEntityType,
@@ -54,7 +56,8 @@ const NewFlowDialog = (props) => {
           pageSize: props.newStepToFlowOptions.pageSize,
           sortOrderInfo: props.newStepToFlowOptions.sortOrderInfo,
           page: props.newStepToFlowOptions.page
-        }});
+        }
+      });
     }
   };
 
@@ -65,7 +68,7 @@ const NewFlowDialog = (props) => {
     }
   };
 
-  const handleSubmit = async (event: { preventDefault: () => void; }) => {
+  const handleSubmit = async (event: {preventDefault: () => void;}) => {
     if (!flowName || invalidChars) {
       // missing name
       setFlowNameTouched(true);
@@ -148,14 +151,14 @@ const NewFlowDialog = (props) => {
         validateStatus={(flowName || !isFlowNameTouched) ? (invalidChars ? "error" : "") : "error"}
         help={invalidChars ? "Names must start with a letter and can contain letters, numbers, hyphens, and underscores only." : (flowName || !isFlowNameTouched) ? "" : "Name is required"}
         >
-          { tobeDisabled?<Tooltip title={NewFlowTooltips.nameField} placement={"bottom"} > <Input
+          {tobeDisabled ? <Tooltip title={NewFlowTooltips.nameField} placement={"bottom"} > <Input
             id="name"
             placeholder="Enter name"
             value={flowName}
             onChange={handleChange}
             disabled={tobeDisabled}
             className={styles.input}
-          /></Tooltip>:<Input
+          /></Tooltip> : <Input
             id="name"
             placeholder="Enter name"
             value={flowName}
@@ -185,17 +188,17 @@ const NewFlowDialog = (props) => {
         <br /><br />
         <Form.Item className={styles.submitButtonsForm}>
           <div className={styles.submitButtons}>
-            <><Button aria-label="Cancel" onClick={() => onCancel()}>Cancel</Button>
-            &nbsp;&nbsp;
-              <Button
+            <><HCButton aria-label="Cancel" variant="outline-light" onClick={() => onCancel()}>Cancel</HCButton>
+              &nbsp;&nbsp;
+              <HCButton
                 aria-label="Save"
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
                 disabled={!props.canWriteFlow}
                 onClick={handleSubmit}
               >
-              Save
-              </Button></>
+                Save
+              </HCButton></>
           </div>
         </Form.Item>
       </Form>

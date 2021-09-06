@@ -1,6 +1,6 @@
 
 import React, {useState, useEffect, CSSProperties, useRef, useContext} from "react";
-import {Card, Table, Icon, Input, Dropdown, Menu, Checkbox, Button, Tooltip} from "antd";
+import {Card, Table, Icon, Input, Dropdown, Menu, Checkbox, Tooltip} from "antd";
 import styles from "./mapping-step-detail.module.scss";
 import "./mapping-step-detail.scss";
 import EntityMapTable from "../entity-map-table/entity-map-table";
@@ -29,6 +29,7 @@ import {clearSessionStorageOnRefresh, getViewSettings, setViewSettings} from "..
 import {paginationMapping, mappingColors} from "../../../../config/mapping.config";
 import useDynamicRefs from "use-dynamic-refs";
 import HCAlert from "../../../common/hc-alert/hc-alert";
+import HCButton from "../../../common/hc-button/hc-button";
 
 const DEFAULT_MAPPING_STEP: MappingStep = {
   name: "",
@@ -858,16 +859,16 @@ const MappingStepDetail: React.FC = () => {
           onPressEnter={() => handleColSearch(selectedKeys, confirm, dataIndex)}
           className={styles.searchInput}
         />
-        <Button data-testid={`ResetSearch-${dataIndex}`} onClick={() => handleSourceSearchReset(clearFilters, dataIndex)} size="small" className={styles.resetButton}>Reset</Button>
-        <Button
+        <HCButton data-testid={`ResetSearch-${dataIndex}`} onClick={() => handleSourceSearchReset(clearFilters, dataIndex)} variant="outline-light" size="sm" className={styles.resetButton}>Reset</HCButton>
+        <HCButton
           data-testid={`submitSearch-${dataIndex}`}
-          type="primary"
+          variant="primary"
           onClick={() => handleColSearch(selectedKeys, confirm, dataIndex)}
-          size="small"
+          size="sm"
           className={styles.searchSubmitButton}
         >
           <Icon type="search" theme="outlined" /> Search
-        </Button>
+        </HCButton>
       </div>
     ),
     filterIcon: filtered => <i><FontAwesomeIcon data-testid={`filterIcon-${dataIndex}`} icon={faSearch} size="lg" className={filtered ? "active" : "inactive"} /></i>,
@@ -1377,13 +1378,13 @@ const MappingStepDetail: React.FC = () => {
             <span className={styles.stepSettingsLabel}>Step Settings</span>
           </div>
           <span className={styles.clearTestIcons} id="ClearTestButtons">
-            <Button id="Clear-btn" mat-raised-button="true" color="primary" disabled={emptyData} onClick={() => onClear()}>
+            <HCButton id="Clear-btn" mat-raised-button="true" variant="outline-light" disabled={emptyData} onClick={() => onClear()}>
               Clear
-            </Button>
+            </HCButton>
             &nbsp;&nbsp;
-            <Button className={styles.btn_test} id="Test-btn" mat-raised-button="true" type="primary" disabled={emptyData || mapExpTouched} onClick={() => getMapValidationResp(sourceURI)}>
+            <HCButton className={styles.btn_test} id="Test-btn" mat-raised-button="true" variant="primary" disabled={emptyData || mapExpTouched} onClick={() => getMapValidationResp(sourceURI)}>
               Test
-            </Button>
+            </HCButton>
           </span>
           <div data-testid="foreignKeyIconLegend" className={styles.legendText}><FontAwesomeIcon className={styles.foreignKeyIcon} icon={faKey} /> <i>Foreign Key Relationship</i></div>
           <div data-testid="relatedEntityIconLegend" className={styles.legendText}><img className={styles.relatedIcon} src={relatedEntityIcon} alt={""} /> Related Entity</div>

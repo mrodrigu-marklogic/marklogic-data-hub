@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from "react";
-import {Form, Input, Icon, Radio, AutoComplete, Button, Tooltip} from "antd";
+import {Form, Input, Icon, Radio, AutoComplete, Tooltip} from "antd";
 import axios from "axios";
 import styles from "./create-edit-step.module.scss";
 import "./create-edit-step.scss";
@@ -8,6 +8,7 @@ import {NewMapTooltips, NewMatchTooltips, NewMergeTooltips, CommonStepTooltips} 
 import {StepType} from "../../../types/curation-types";
 import {CurationContext} from "../../../util/curation-context";
 import HCAlert from "../../common/hc-alert/hc-alert";
+import HCButton from "../../common/hc-button/hc-button";
 
 type Props = {
   tabKey: string;
@@ -581,11 +582,11 @@ const CreateEditStep: React.FC<Props> = (props) => {
 
         <Form.Item className={styles.submitButtonsForm}>
           <div className={styles.submitButtons}>
-            <Button data-testid={`${props.stepType}-dialog-cancel`} onClick={() => onCancel()}>Cancel</Button>
+            <HCButton data-testid={`${props.stepType}-dialog-cancel`} variant="outline-light" size="sm" onClick={() => onCancel()}>Cancel</HCButton>
             &nbsp;&nbsp;
             {!props.canReadWrite ? <Tooltip title={NewMergeTooltips.missingPermission} placement={"bottomRight"}><span className={styles.disabledCursor}>
-              <Button className={styles.disabledSaveButton} type="primary" htmlType="submit" disabled={true} data-testid={`${props.stepType}-dialog-save`} onClick={handleSubmit}>Save</Button></span></Tooltip>
-              : <Button type="primary" htmlType="submit" disabled={false} data-testid={`${props.stepType}-dialog-save`} onClick={handleSubmit} onFocus={sendPayload}>Save</Button>}
+              <HCButton size="sm" className={styles.disabledSaveButton} variant="primary" type="submit" disabled={true} data-testid={`${props.stepType}-dialog-save`} onClick={handleSubmit}>Save</HCButton></span></Tooltip>
+              : <HCButton variant="primary" size="sm" type="submit" disabled={false} data-testid={`${props.stepType}-dialog-save`} onClick={handleSubmit} onFocus={sendPayload}>Save</HCButton>}
           </div>
         </Form.Item>
       </Form>

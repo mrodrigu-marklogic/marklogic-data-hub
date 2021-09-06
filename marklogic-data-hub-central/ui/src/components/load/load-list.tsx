@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from "react";
 import {Link, useLocation, useHistory} from "react-router-dom";
 import styles from "./load-list.module.scss";
 import "./load-list.scss";
-import {Table, Icon, Modal, Menu, Select, Dropdown, Button, Tooltip} from "antd";
+import {Table, Icon, Modal, Menu, Select, Dropdown, Tooltip} from "antd";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -14,6 +14,7 @@ import {AdvLoadTooltips, SecurityTooltips} from "../../config/tooltips.config";
 import {LoadingContext} from "../../util/loading-context";
 import {getViewSettings, setViewSettings} from "../../util/user-context";
 import HCDivider from "../common/hc-divider/hc-divider";
+import HCButton from "../common/hc-button/hc-button";
 
 const {Option} = Select;
 
@@ -451,7 +452,7 @@ const LoadList: React.FC<Props> = (props) => {
     <div id="load-list" aria-label="load-list" className={styles.loadList}>
       <div className={styles.addNewContainer}>
         {props.canReadWrite ? <div>
-          <Button aria-label="add-new-list" type="primary" size="default" className={styles.addNewButton} onClick={OpenAddNew}>Add New</Button>
+          <HCButton aria-label="add-new-list" variant="primary" onClick={OpenAddNew}>Add New</HCButton>
         </div> : ""}
       </div>
       <Table

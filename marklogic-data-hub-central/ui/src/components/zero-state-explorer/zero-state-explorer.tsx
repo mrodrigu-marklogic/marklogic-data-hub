@@ -1,5 +1,5 @@
 import React, {useState, useContext} from "react";
-import {Card, Select, Input, Button, Radio, Tooltip} from "antd";
+import {Card, Select, Input, Radio, Tooltip} from "antd";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import styles from "./zero-state-explorer.module.scss";
@@ -10,6 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStream, faTable, faThLarge} from "@fortawesome/free-solid-svg-icons";
 import tiles from "../../config/tiles.config";
 import HCDivider from "../common/hc-divider/hc-divider";
+import HCButton from "../common/hc-button/hc-button";
 
 const ZeroStateExplorer = (props) => {
   const {
@@ -235,7 +236,7 @@ const ZeroStateExplorer = (props) => {
                   <br />
                   <Col xs={12}>
                     <div className={styles.exploreButton}>
-                      <Button type="primary" data-cy="explore" className={styles.button} onClick={onClickExplore} >Explore</Button>
+                      <HCButton variant="primary" data-cy="explore" className={styles.button} onClick={onClickExplore} >Explore</HCButton>
                     </div>
                   </Col>
                 </Row>

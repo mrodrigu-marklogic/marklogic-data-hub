@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from "react";
 import {ModelingContext} from "../../../../util/modeling-context";
-import {Modal, Input, Select, Icon, Card, Dropdown, Button, Tooltip} from "antd";
+import {Modal, Input, Select, Icon, Card, Dropdown, Tooltip} from "antd";
 import {DownOutlined} from "@ant-design/icons";
 import DropDownWithSearch from "../../../common/dropdown-with-search/dropdownWithSearch";
 import styles from "./add-edit-relationship.module.scss";
@@ -19,6 +19,7 @@ import {
   PropertyType,
   EntityModified
 } from "../../../../types/modeling-types";
+import HCButton from "../../../common/hc-button/hc-button";
 
 type Props = {
   openRelationshipModal: boolean;
@@ -516,20 +517,19 @@ const AddEditRelationship: React.FC<Props> = (props) => {
         </i>
       </Tooltip>
     </div>
-    <Button
+    <HCButton
       aria-label="relationship-modal-cancel"
-      size="default"
+      variant="outline-light"
       onClick={onCancel}
-    >Cancel</Button>
-    <Button
+    >Cancel</HCButton>
+    <HCButton
       aria-label="relationship-modal-submit"
-      form="property-form"
-      type="primary"
-      htmlType="submit"
-      size="default"
+      // form="property-form"
+      variant="primary"
+      type="submit"
       loading={loading}
       onClick={onSubmit}
-    >{props.isEditing ? "Save" : "Add"}</Button>
+    >{props.isEditing ? "Save" : "Add"}</HCButton>
   </div>;
 
   const confirmAction = async () => {
@@ -580,9 +580,9 @@ const AddEditRelationship: React.FC<Props> = (props) => {
         </div>
         <hr className={styles.horizontalLine}></hr>
         <Tooltip title={ModelingTooltips.cardinalityButton} placement={"bottom"}>
-          <Button className={styles.cardinalityButton} data-testid="cardinalityButton" onClick={() => toggleCardinality()}>
+          <HCButton className={styles.cardinalityButton} data-testid="cardinalityButton" onClick={() => toggleCardinality()}>
             {oneToManySelected ? <img data-testid="oneToManyIcon" className={styles.oneToManyIcon} src={oneToManyIcon} alt={""} onClick={() => toggleCardinality()}/> : <img data-testid="oneToOneIcon" className={styles.oneToOneIcon} src={oneToOneIcon} alt={""} onClick={() => toggleCardinality()}/>}
-          </Button>
+          </HCButton>
         </Tooltip>
         <div className={styles.joinPropertyDropdownContainer}>
           {joinPropertyDropdown}

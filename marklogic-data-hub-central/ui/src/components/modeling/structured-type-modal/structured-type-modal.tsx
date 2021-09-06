@@ -1,9 +1,10 @@
 import React, {useEffect, useState, useContext} from "react";
-import {Form, Icon, Input, Modal, Button, Tooltip} from "antd";
+import {Form, Icon, Input, Modal, Tooltip} from "antd";
 import styles from "./structured-type-modal.module.scss";
 
 import {ModelingContext} from "../../../util/modeling-context";
 import {ModelingTooltips} from "../../../config/tooltips.config";
+import HCButton from "../../common/hc-button/hc-button";
 
 
 type Props = {
@@ -64,19 +65,18 @@ const StructuredTypeModal: React.FC<Props> = (props) => {
   };
 
   const modalFooter = <div className={styles.modalFooter}>
-    <Button
+    <HCButton
       aria-label="structured-type-modal-cancel"
-      size="default"
+      variant="outline-light"
       onClick={onCancel}
-    >Cancel</Button>
-    <Button
+    >Cancel</HCButton>
+    <HCButton
       aria-label="structured-type-modal-submit"
-      form="pstructured-type-form"
-      type="primary"
-      htmlType="submit"
-      size="default"
+      // form="pstructured-type-form"
+      variant="primary"
+      type="submit"
       onClick={onSubmit}
-    >Add</Button>
+    >Add</HCButton>
   </div>;
 
   return (

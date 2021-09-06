@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useContext} from "react";
-import {Popover, Tree, Input, Button, Tooltip} from "antd";
+import {Popover, Tree, Input, Tooltip} from "antd";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faColumns} from "@fortawesome/free-solid-svg-icons";
 import styles from "./column-selector.module.scss";
 import {treeConverter, getCheckedKeys, getSelectedTableProperties, setTreeVisibility, getParentKey} from "../../util/data-conversion";
 import {SearchContext} from "../../util/search-context";
 import HCDivider from "../common/hc-divider/hc-divider";
+import HCButton from "../common/hc-button/hc-button";
 
 interface Props {
   entityPropertyDefinitions: any[];
@@ -162,8 +163,8 @@ const ColumnSelector: React.FC<Props> = (props) => {
       <footer>
         <HCDivider className={styles.divider} />
         <div className={styles.footer}>
-          <Button size="small" onClick={onClose} >Cancel</Button>
-          <Button size="small" onClick={onApply} disabled={!checkedKeys.length} >Apply</Button>
+          <HCButton size="sm" variant="outline-light" onClick={onClose} >Cancel</HCButton>
+          <HCButton size="sm" onClick={onApply} disabled={!checkedKeys.length} >Apply</HCButton>
         </div>
       </footer>
     </div>
