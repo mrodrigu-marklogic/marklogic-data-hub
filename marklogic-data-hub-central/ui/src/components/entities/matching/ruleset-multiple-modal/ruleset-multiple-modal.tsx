@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, CSSProperties} from "react";
-import {Modal, Form, Input, Icon, Switch, Table, Tag, Button, Select, Tooltip} from "antd";
+import {Modal, Form, Input, Icon, Switch, Table, Button, Select, Tooltip} from "antd";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLayerGroup, faTrashAlt} from "@fortawesome/free-solid-svg-icons";
 import "./ruleset-multiple-modal.scss";
@@ -14,6 +14,7 @@ import {MatchingStep, MatchRule, MatchRuleset} from "../../../../types/curation-
 import {updateMatchingArtifact} from "../../../../api/matching";
 import DeleteModal from "../delete-modal/delete-modal";
 import HCAlert from "../../../common/hc-alert/hc-alert";
+import HCTag from "../../../common/hc-tag/hc-tag";
 
 type Props = {
   editRuleset: any;
@@ -1065,9 +1066,14 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
   };
 
   const displayMatchOnTags = () => {
-    return Object.keys(matchOnTags).map((prop) => <Tag key={prop} aria-label={`${prop}-matchOn-tag`} className={styles.matchOnTags} closable onClose={() => closeMatchOnTag(prop)}>
-      {matchOnTags[prop]}
-    </Tag>);
+    return Object.keys(matchOnTags).map((prop) =>
+      <HCTag key={prop}
+        label={matchOnTags[prop]}
+        ariaLabel={`${prop}-matchOn-tag`}
+        className={styles.matchOnTags}
+        onClose={() => closeMatchOnTag(prop)}
+      />
+    );
   };
 
   const toggleRowExpanded = (expanded, record) => {
