@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext, CSSProperties} from "react";
-import {Table, Select} from "antd";
+import {Select} from "antd";
 import {Row, Col, Modal, Form, FormLabel, FormCheck} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLayerGroup} from "@fortawesome/free-solid-svg-icons";
@@ -14,8 +14,8 @@ import ExpandCollapse from "../../../expand-collapse/expand-collapse";
 import {MatchingStep, MatchRule, MatchRuleset} from "../../../../types/curation-types";
 import {updateMatchingArtifact} from "../../../../api/matching";
 import DeleteModal from "../delete-modal/delete-modal";
-import {ChevronDown, ChevronRight, QuestionCircleFill} from "react-bootstrap-icons";
-import {ConfirmYesNo, HCAlert, HCInput, HCButton, HCTag, HCTooltip} from "@components/common";
+import {QuestionCircleFill} from "react-bootstrap-icons";
+import {ConfirmYesNo, HCAlert, HCInput, HCButton, HCTag, HCTooltip, HCTable} from "@components/common";
 
 type Props = {
   editRuleset: any;
@@ -878,20 +878,22 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
 
   const multipleRulesetsTableColumns = [
     {
-      title: <span data-testid="nameTitle">Name</span>,
-      dataIndex: "propertyName",
+      text: "Name",
+      dataField: "propertyName",
       key: "propertyPath",
       width: "17%",
       ellipsis: true,
-      render: (text, row) => {
+      headerFormatter: () => <span data-testid="nameTitle">Name</span>,
+      formatter: (text, row) => {
         return <span className={row.hasOwnProperty("children") ? styles.nameColumnStyle : ""}>{text} {row.hasOwnProperty("children") ? <FontAwesomeIcon className={styles.structuredIcon} icon={faLayerGroup} /> : ""} {row.multiple ? <img className={styles.arrayImage} src={arrayIcon} /> : ""}</span>;
       }
     },
     {
       ellipsis: true,
-      title: <span data-testid="matchTypeTitle">Match Type</span>,
+      text: "Match Type",
       width: "15%",
-      render: (text, row) => {
+      headerFormatter: () => <span data-testid="matchTypeTitle">Match Type</span>,
+      formatter: (text, row) => {
         return !row.hasOwnProperty("children") ? <div className={styles.typeContainer}>
           <Select
             aria-label={`${row.propertyPath}-match-type-dropdown`}
@@ -908,9 +910,10 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
       }
     },
     {
-      title: <span data-testid="matchTypeDetailsTitle">Match Type Details</span>,
+      text: "Match Type Details",
       width: "68%",
-      render: (text, row) => {
+      headerFormatter: () => <span data-testid="matchTypeDetailsTitle">Match Type Details</span>,
+      formatter: (text, row) => {
         switch (matchTypes[row.propertyPath]) {
         case "synonym": return renderSynonymOptions(row.propertyPath);
         case "doubleMetaphone": return renderDoubleMetaphoneOptions(row.propertyPath);
@@ -944,8 +947,10 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
   const getMatchOnTags = (selectedRowKeys) => {
     let matchTags = {};
     selectedRowKeys.forEach(key => {
-      let tag = key.split(".").join(" > ");
-      matchTags[`${key}`] = tag;
+      if (key) {
+        let tag = key.split(".").join(" > ");
+        matchTags[`${key}`] = tag;
+      }
     });
     return matchTags;
   };
@@ -1046,20 +1051,24 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
   };
 
   const rowSelection = {
-    onChange: (selected, selectedRows) => {
-      let fkeys = selectedRows.map(row => row.propertyPath);
-      setSelectedRowKeys([...fkeys]);
-    },
-    onSelect: (record, selected, selectedRows) => {
+    onSelect: (record, selected) => {
+      if (selectedRowKeys.includes(record.propertyPath)) {
+        let fkeys = selectedRowKeys.map(row => row && row.propertyPath);
+        if (!fkeys) {
+          setSelectedRowKeys([]);
+        } else {
+          setSelectedRowKeys([...fkeys]);
+        }
+      } else {
+        setSelectedRowKeys([...selectedRowKeys, record.propertyPath]);
+      }
+
       if (!selected) {
         handlePropertyDeselection(record.propertyPath);
       }
     },
-    selectedRowKeys: selectedRowKeys,
-    getCheckboxProps: record => ({
-      name: (record.hasOwnProperty("structured") && record.structured !== "" && record.hasChildren ? "hidden" : record.propertyPath),
-      style: (record.hasOwnProperty("structured") && record.structured !== "" && record.hasChildren ? {display: "none"} : {})
-    }),
+    selectedRowKeys: selectedRowKeys && !selectedRowKeys[0] ? [] : selectedRowKeys,
+    nonSelectable: multipleRulesetsData.filter(record => record.hasOwnProperty("structured") && record.structured !== "" && record.hasChildren).map(record => record.propertyPath),
   };
 
   const closeMatchOnTag = (tagKey) => {
@@ -1132,7 +1141,7 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
     showSizeChanger: true,
     pageSizeOptions: ["10", "20", "40", "60"]
   };
-
+  /*
   const customExpandIcon = (props) => {
     if (props.expandable) {
       if (props.expanded) {
@@ -1145,7 +1154,7 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
         }}><ChevronRight data-testid="expandedIcon" /> </a>;
       }
     }
-  };
+  }; */
 
   const confirmAction = () => {
     props.toggleModal(false);
@@ -1223,7 +1232,23 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
           </div>
 
           <div id="multipleRulesetsTableContainer" data-testid="multipleRulesetsTableContainer">
-            <Table
+            <HCTable
+              pagination={paginationOptions}
+              className={styles.entityTable}
+              onExpand={(record, expanded) => toggleRowExpanded(expanded, record)}
+              expandedRowKeys={expandedRowKeys}
+              rowClassName={() => styles.entityTableRows}
+              rowSelection={{...rowSelection}}
+              columns={multipleRulesetsTableColumns}
+              data={multipleRulesetsData}
+              rowKey="propertyPath"
+              showExpandIndicator={true}
+              childrenIndent={true}
+              nestedParams={{headerColumns: multipleRulesetsTableColumns, state: [expandedRowKeys, setExpandedRowKeys]}}
+              keyUtil="propertyPath"
+              baseIndent={10}
+            />
+            {/*<Table
               pagination={paginationOptions}
               className={styles.entityTable}
               expandIcon={(props) => customExpandIcon(props)}
@@ -1238,7 +1263,7 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
               tableLayout="unset"
               rowKey="propertyPath"
               getPopupContainer={() => document.getElementById("multipleRulesetsTableContainer") || document.body}
-            /></div>
+            />*/}</div>
           {modalFooter}
         </Form>
         {discardChanges}

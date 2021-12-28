@@ -1,27 +1,22 @@
 @import "../../../theme/HCVariables.scss";
 .react-bootstrap-table {
-    .expand-cell-header {
+    .expand-cell-header, .selection-cell-header {
         border-top-left-radius: 4px;
-        background-color: #e8e8e8 !important;
         padding: 16px 16px !important;
         pointer-events: none;
         color: transparent;
         vertical-align: middle;
-        width: 50px;
-        min-width: 50px;
+        width: 20px;
+        min-width: 20px;
+        background: #e8e8e8 !important;
 
         .hc-table_subTableHeader {
             background: #e0e0e0 !important;
             color: #333;
         }
     }
-    .expand-cell-header {
-      width: 20px;
-      min-width: 20px;
-      background: #e8e8e8 !important;
-    }
     &.sub-table {
-        .expand-cell-header {
+        .expand-cell-header, .selection-cell-header {
             background: #e0e0e0 !important;
         }
         &.side-panel th:nth-child(2),
