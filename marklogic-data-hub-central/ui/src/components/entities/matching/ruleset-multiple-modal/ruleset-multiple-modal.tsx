@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext, CSSProperties} from "react";
-import {Select} from "antd";
 import {Row, Col, Modal, Form, FormLabel, FormCheck} from "react-bootstrap";
+import Select, {components as SelectComponents} from "react-select";
+import reactSelectThemeConfig from "../../../../config/react-select-theme.config";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLayerGroup} from "@fortawesome/free-solid-svg-icons";
 import {faTrashAlt} from "@fortawesome/free-regular-svg-icons";
@@ -34,8 +35,6 @@ const MATCH_TYPE_OPTIONS = [
   {name: "Zip", value: "zip"},
   {name: "Custom", value: "custom"},
 ];
-
-const {Option} = Select;
 
 const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
   const {curationOptions, updateActiveStepArtifact} = useContext(CurationContext);
@@ -545,10 +544,10 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
     }
   };
 
-  const onMatchTypeSelect = (propertyPath: string, value: string) => {
+  const onMatchTypeSelect = (propertyPath: string, option: any) => {
     setMatchTypeErrorMessages({...matchTypeErrorMessages, [propertyPath]: ""});
     setIsMatchTypeTouched(true);
-    setMatchTypes({...matchTypes, [propertyPath]: value});
+    setMatchTypes({...matchTypes, [propertyPath]: option.value});
     if (!selectedRowKeys.includes(propertyPath)) {
       let selectedKeys = [...selectedRowKeys, propertyPath];
       setSelectedRowKeys(selectedKeys);
@@ -670,10 +669,6 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
     return errorCheck;
   };
 
-  const renderMatchOptions = MATCH_TYPE_OPTIONS.map((matchType, index) => {
-    return <Option key={index} value={matchType.value} aria-label={`${matchType.value}-option`}>{matchType.name}</Option>;
-  });
-
   const inputUriStyle = (propertyPath, fieldType) => {
     const inputFieldStyle: CSSProperties = {
       width: ["dictionary-uri-input", "thesaurus-uri-input"].includes(fieldType) ? "22vw" : (fieldType === "distance-threshold-input" ? "25vw" : "13vw"),
@@ -683,15 +678,6 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
       borderColor: checkFieldInErrors(propertyPath, fieldType) ? "red" : ""
     };
     return inputFieldStyle;
-  };
-
-  const matchTypeCSS = (propertyPath) => {
-    const matchTypeStyle: CSSProperties = {
-      width: "160px",
-      border: checkFieldInErrors(propertyPath, "match-type-input") ? "0.6px solid red" : "",
-      borderRadius: "5px"
-    };
-    return matchTypeStyle;
   };
 
   const validationErrorStyle = (fieldType) => {
@@ -876,6 +862,14 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
     }
   };
 
+  const MenuList  = (selector, props) => (
+    <div id={`${selector}-select-MenuList`}>
+      <SelectComponents.MenuList {...props} />
+    </div>
+  );
+
+  const renderMatchOptions = MATCH_TYPE_OPTIONS.map((matchType, index) => ({value: matchType.value, label: matchType.name}));
+
   const multipleRulesetsTableColumns = [
     {
       text: "Name",
@@ -896,15 +890,33 @@ const MatchRulesetMultipleModal: React.FC<Props> = (props) => {
       formatter: (text, row) => {
         return !row.hasOwnProperty("children") ? <div className={styles.typeContainer}>
           <Select
-            aria-label={`${row.propertyPath}-match-type-dropdown`}
-            style={matchTypeCSS(row.propertyPath)}
-            size="default"
+            id={`${row.propertyPath}-select-wrapper`}
+            inputId={`${row.propertyPath}-select`}
+            components={{MenuList: props => MenuList(`${row.propertyPath}`, props)}}
             placeholder="Select match type"
-            onSelect={(e) => onMatchTypeSelect(row.propertyPath, e)}
-            value={matchTypes[row.propertyPath]}
-          >
-            {renderMatchOptions}
-          </Select>
+            value={renderMatchOptions.find(item => item.value === matchTypes[row.propertyPath])}
+            onChange={(e) => onMatchTypeSelect(row.propertyPath, e)}
+            aria-label={`${row.propertyPath}-match-type-dropdown`}
+            isSearchable={false}
+            options={renderMatchOptions}
+            formatOptionLabel={({value, label}) => {
+              return (
+                <span aria-label={`${value}-option`}>
+                  {label}
+                </span>
+              );
+            }}
+            styles={{...reactSelectThemeConfig,
+              container: (provided, state) => ({
+                ...provided,
+                width: "180px",
+              }),
+              control: (provided, state) => ({
+                ...provided,
+                border: state.menuIsOpen ? "1px solid #808cbd" : (checkFieldInErrors(row.propertyPath, "match-type-input") ? "1px solid #b32424" : "1px solid #d9d9d9"),
+              })
+            }}
+          />
           {checkFieldInErrors(row.propertyPath, "match-type-input") ? <div id="errorInMatchType" data-testid={row.propertyPath + "-match-type-err"} style={validationErrorStyle("match-type-input")}>{!matchTypes[row.propertyPath] ? "A match type is required" : ""}</div> : ""}
         </div> : null;
       }
